@@ -357,12 +357,20 @@ function moveSelection(delta) {
   select(Math.max(0, Math.min(state.hits.length - 1, state.selected + delta)));
 }
 
+/** Fait défiler la liste seule : scrollIntoView ferait aussi glisser toute la page hors de l'onglet. */
+function revealCard(card) {
+  const box = $("results");
+  const r = card.getBoundingClientRect(), b = box.getBoundingClientRect();
+  if (r.top < b.top) box.scrollTop -= b.top - r.top + 6;
+  else if (r.bottom > b.bottom) box.scrollTop += r.bottom - b.bottom + 6;
+}
+
 let previewTimer = 0;
 function select(i, { keepPreview = false } = {}) {
   state.selected = i;
   const cards = $("results").children;
   for (const c of cards) c.classList.toggle("on", +c.dataset.i === i);
-  if (cards[i]) cards[i].scrollIntoView({ block: "nearest" });
+  if (cards[i]) revealCard(cards[i]);
   clearTimeout(previewTimer);
   if (keepPreview && state.current && state.current.dbId === state.hits[i].id) {
     previewTimer = setTimeout(() => loadPreview(state.hits[i]), 120); // nouveau surlignage
@@ -457,21 +465,60 @@ $("rAtts").addEventListener("click", async e => {
 
 // ---------- Ouverture dans Thunderbird ----------
 
-/** Retrouve le message dans Thunderbird par son Message-ID, en préférant le même dossier. */
+// messages.query ne consulte aucun index : il lit un par un tous les messages des dossiers
+// demandés. Sans dossier précis, il parcourt tous les comptes (des minutes sur un gros profil).
+// On cherche donc d'abord dans le dossier que le moteur connaît, puis dans le compte.
+
+let tbAccounts = null;
+
+/** Identifiant Thunderbird ("account3") du compte qui porte ce nom dans l'index. */
+async function tbAccountId(name) {
+  if (!tbAccounts) tbAccounts = await messenger.accounts.list(false);
+  const a = tbAccounts.find(x => x.name === name);
+  return a ? a.id : null;
+}
+
+/** Première page de résultats, puis arrêt du parcours que Thunderbird poursuivrait en arrière-plan. */
+async function queryMessages(info) {
+  const list = await messenger.messages.query(info);
+  if (list && list.id) messenger.messages.abortList(list.id).catch(() => {});
+  return (list && list.messages) || [];
+}
+
+/** Retrouve le message dans Thunderbird par son Message-ID : dossier exact, puis compte, puis partout. */
 async function findTbMessage(hit) {
   if (!hit.msgid) return null;
-  const list = await messenger.messages.query({ headerMessageId: hit.msgid });
-  const msgs = (list && list.messages) || [];
+  const accountId = await tbAccountId(hit.account);
+  if (accountId) {
+    try {
+      // Identifiant de dossier Thunderbird : "<compte>:/<chemin>", le chemin commençant par "/"
+      const inFolder = await queryMessages({ headerMessageId: hit.msgid, folderId: `${accountId}://${hit.folder}` });
+      if (inFolder.length) return inFolder[0];
+    } catch { /* nom de dossier différent sur le disque : on élargit au compte */ }
+    const inAccount = await queryMessages({ headerMessageId: hit.msgid, accountId });
+    if (inAccount.length) return pickFolder(inAccount, hit);
+  }
+  return pickFolder(await queryMessages({ headerMessageId: hit.msgid }), hit);
+}
+
+function pickFolder(msgs, hit) {
   if (!msgs.length) return null;
   const want = hit.folder.toLowerCase();
   return msgs.find(m => m.folder && decodeURIComponent(m.folder.path || "").toLowerCase().replace(/^\//, "").endsWith(want)) || msgs[0];
+}
+
+/** Recherche du message avec un message d'attente si elle dépasse une demi-seconde. */
+async function findWithNotice(hit) {
+  const t = setTimeout(() => toast("Recherche du message dans Thunderbird…"), 500);
+  try { return await findTbMessage(hit); }
+  finally { clearTimeout(t); }
 }
 
 async function openInThunderbird() {
   const hit = state.hits[state.selected];
   if (!hit) return;
   try {
-    const m = await findTbMessage(hit);
+    const m = await findWithNotice(hit);
     if (!m) return toast("Message introuvable dans Thunderbird (supprimé ou dossier non synchronisé).");
     await messenger.messageDisplay.open({ messageId: m.id, location: "tab", active: true });
   } catch (e) {
@@ -483,7 +530,7 @@ async function showInFolder() {
   const hit = state.hits[state.selected];
   if (!hit) return;
   try {
-    const m = await findTbMessage(hit);
+    const m = await findWithNotice(hit);
     if (!m) return toast("Message introuvable dans Thunderbird (supprimé ou dossier non synchronisé).");
     const tabs = await messenger.mailTabs.query({ currentWindow: true });
     const tab = tabs.find(t => t.active) || tabs[0] || await messenger.mailTabs.create({});

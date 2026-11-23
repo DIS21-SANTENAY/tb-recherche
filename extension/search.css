@@ -22,11 +22,11 @@
 }
 
 * { box-sizing: border-box; }
-html, body { height: 100%; margin: 0; }
+/* "clip" et non "hidden" : une page en hidden peut encore défiler par programme et glisser hors de l'onglet */
+html, body { height: 100%; margin: 0; overflow: clip; }
 body {
-  display: grid; grid-template-columns: 250px 1fr;
+  display: grid; grid-template-columns: 250px 1fr; grid-template-rows: 100%;
   font: 13px/1.4 "Segoe UI", system-ui, sans-serif; color: var(--ink); background: var(--bg);
-  overflow: hidden;
 }
 button { font: inherit; cursor: pointer; }
 .muted { color: var(--muted); }
