@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "TB Recherche",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Recherche instantanée dans tous vos mails et le contenu de leurs pièces jointes.",
   "author": "DIS21",
   "browser_specific_settings": {

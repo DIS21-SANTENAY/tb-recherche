@@ -486,10 +486,12 @@ async function showInFolder() {
     const m = await findTbMessage(hit);
     if (!m) return toast("Message introuvable dans Thunderbird (supprimé ou dossier non synchronisé).");
     const tabs = await messenger.mailTabs.query({ currentWindow: true });
-    const tab = tabs[0] || await messenger.mailTabs.create({});
-    await messenger.mailTabs.update(tab.id, { displayedFolder: m.folder.id ?? m.folder });
-    await messenger.mailTabs.setSelectedMessages(tab.id, [m.id]);
+    const tab = tabs.find(t => t.active) || tabs[0] || await messenger.mailTabs.create({});
+    // L'onglet courrier passe d'abord au premier plan : sa liste de messages doit être chargée.
     await messenger.tabs.update(tab.id, { active: true });
+    // En Manifest V3, seul displayedFolderId est accepté (displayedFolder est réservé à la V2).
+    await messenger.mailTabs.update(tab.id, { displayedFolderId: m.folder.id });
+    await messenger.mailTabs.setSelectedMessages(tab.id, [m.id]);
   } catch (e) {
     toast("Affichage impossible : " + e.message);
   }
