@@ -70,7 +70,7 @@ Raccourcis : Ctrl+F pour revenir à la recherche, flèches haut et bas pour parc
 ## Comment ça marche
 
 ```mermaid
-flowchart LR
+flowchart TD
     P["Profil Thunderbird<br/>fichiers mbox ou maildir<br/>lus sans être modifiés"]
     I["Indexation<br/>découpage des mails<br/>texte des pièces jointes"]
     DB[("Index SQLite FTS5<br/>sur le poste")]
@@ -96,7 +96,7 @@ flowchart LR
 
 - Ni compte, ni serveur, ni télémétrie : TB Recherche ne se connecte à rien. Seules les images distantes d'un mail se chargent, et uniquement quand on clique sur « Afficher les images ».
 - Le profil Thunderbird est ouvert en lecture seule.
-- Les images distantes des mails sont bloquées par défaut, ce qui neutralise les pixels de suivi.
+- Bloquer les images distantes par défaut neutralise aussi les pixels de suivi des expéditeurs.
 - L'index et les copies temporaires restent dans le profil Windows de l'utilisateur.
 
 ## Où sont les données
