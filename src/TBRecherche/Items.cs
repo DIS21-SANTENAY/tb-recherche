@@ -53,6 +53,7 @@ public static class Look
     {
         if (d == DateTime.MinValue) return "";
         var today = DateTime.Today;
+        if (d.Date > today) return d.ToString("dd/MM/yyyy", Fr); // date future : jamais un simple jour de semaine
         if (d.Date == today) return d.ToString("HH:mm", Fr);
         if (d.Date == today.AddDays(-1)) return "Hier";
         if (d.Date > today.AddDays(-7)) return Fr.TextInfo.ToTitleCase(d.ToString("dddd", Fr));

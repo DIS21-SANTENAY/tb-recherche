@@ -78,6 +78,7 @@ function smartDate(iso) {
   const d = new Date(iso), today = new Date(); today.setHours(0, 0, 0, 0);
   const day = new Date(d); day.setHours(0, 0, 0, 0);
   const diff = Math.round((today - day) / 86400000);
+  if (diff < 0) return d.toLocaleDateString(fr); // date future : jamais un simple jour de semaine
   if (diff === 0) return d.toLocaleTimeString(fr, { hour: "2-digit", minute: "2-digit" });
   if (diff === 1) return "Hier";
   if (diff < 7) { const w = d.toLocaleDateString(fr, { weekday: "long" }); return w[0].toUpperCase() + w.slice(1); }

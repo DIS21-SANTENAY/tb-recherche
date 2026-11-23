@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Text;
 using MimeKit;
 using MimeKit.Text;
+using MimeKit.Utils;
 
 namespace TBRecherche.Core;
 
@@ -34,6 +35,32 @@ public static class MessageExtract
         return s != null && int.TryParse(s.Trim(), NumberStyles.HexNumber, null, out var f) && (f & 0x0008) != 0;
     }
 
+    static readonly DateTimeOffset MinPlausible = new(1980, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
+    /// <summary>
+    /// Date du message pour le tri et l'affichage : l'en-tête Date, sauf s'il est absurde (spams datés
+    /// de l'an 8496 pour rester en tête de liste, expéditeurs déréglés). On prend alors la date de
+    /// réception du premier en-tête Received, posée par le serveur. 0 si rien n'est fiable.
+    /// </summary>
+    public static long SortDate(MimeMessage msg)
+    {
+        var max = DateTimeOffset.UtcNow.AddDays(2);
+        bool Ok(DateTimeOffset d) => d >= MinPlausible && d <= max;
+        try { if (msg.Date != DateTimeOffset.MinValue && Ok(msg.Date)) return msg.Date.ToUnixTimeSeconds(); } catch { }
+        try
+        {
+            foreach (var h in msg.Headers)
+            {
+                if (h.Id != HeaderId.Received) continue;
+                var v = h.Value;
+                var i = v.LastIndexOf(';');
+                if (i >= 0 && DateUtils.TryParse(v[(i + 1)..].Trim(), out var d) && Ok(d)) return d.ToUnixTimeSeconds();
+            }
+        }
+        catch { }
+        return 0;
+    }
+
     public static string FormatAddresses(InternetAddressList list) =>
         string.Join(", ", list.Mailboxes.Select(m =>
             string.IsNullOrWhiteSpace(m.Name) ? m.Address : $"{m.Name} <{m.Address}>"));
@@ -41,7 +68,7 @@ public static class MessageExtract
     public static MessageRecord ToRecord(MimeMessage msg, long offset, bool attachText = true, CancellationToken ct = default)
     {
         var r = new MessageRecord { Offset = offset };
-        try { r.Date = msg.Date == DateTimeOffset.MinValue ? 0 : msg.Date.ToUnixTimeSeconds(); } catch { }
+        r.Date = SortDate(msg);
         try { r.Sender = FormatAddresses(msg.From); } catch { }
         try { r.Recipients = FormatAddresses(msg.To) + (msg.Cc.Count > 0 ? ", " + FormatAddresses(msg.Cc) : ""); } catch { }
         r.Subject = msg.Subject ?? "";

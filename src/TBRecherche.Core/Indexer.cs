@@ -62,6 +62,36 @@ public static class Indexer
         }
     }
 
+    /// <summary>
+    /// Messages déjà indexés avec une date absurde (futur lointain, avant 1980) : on relit leurs
+    /// en-têtes pour appliquer MessageExtract.SortDate. Sans cela, ils resteraient en tête du tri
+    /// « Récents » jusqu'à une reconstruction complète. Peu de messages, donc rapide.
+    /// </summary>
+    static void RepairDates(IndexDb db, List<string> warnings, CancellationToken ct)
+    {
+        var max = DateTimeOffset.UtcNow.AddDays(2).ToUnixTimeSeconds();
+        const long min = 315532800; // 01/01/1980
+        var rows = new List<(long Id, string Path, long Offset, bool Maildir)>();
+        using (var c = db.Cmd("SELECT m.id, f.path, m.offset, f.maildir FROM messages m JOIN files f ON f.id = m.file_id " +
+                              "WHERE m.date > $max OR (m.date > 0 AND m.date < $min)", ("$max", max), ("$min", min)))
+        using (var r = c.ExecuteReader())
+            while (r.Read()) rows.Add((r.GetInt64(0), r.GetString(1), r.GetInt64(2), r.GetInt64(3) != 0));
+        if (rows.Count == 0) return;
+
+        using var tx = db.Conn.BeginTransaction();
+        foreach (var row in rows)
+        {
+            if (ct.IsCancellationRequested) break;
+            try
+            {
+                var msg = MessageExtract.Load(row.Path, row.Offset, row.Maildir);
+                db.Exec("UPDATE messages SET date = $d WHERE id = $id", ("$d", MessageExtract.SortDate(msg)), ("$id", row.Id));
+            }
+            catch (Exception ex) { warnings.Add($"Date non corrigée ({row.Path}) : {ex.Message}"); }
+        }
+        tx.Commit();
+    }
+
     static IndexResult RunCore(string dbPath, IList<MailAccount> accounts, IProgress<IndexProgress>? progress,
         CancellationToken ct, bool full)
     {
@@ -69,6 +99,7 @@ public static class Indexer
         var sw = Stopwatch.StartNew();
         var warnings = new List<string>();
         using var db = new IndexDb(dbPath);
+        RepairDates(db, warnings, ct);
 
         progress?.Report(new IndexProgress("Inventaire des dossiers", 0, 0, 0, 0, 0));
         var files = new List<StoreFile>();
