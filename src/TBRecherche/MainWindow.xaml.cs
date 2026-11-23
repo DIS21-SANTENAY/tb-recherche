@@ -15,7 +15,7 @@ namespace TBRecherche;
 
 public partial class MainWindow : Window
 {
-    readonly string dbPath = IndexDb.DefaultPath;
+    readonly string dbPath;
     readonly string? profileDir;
     readonly string? thunderbirdExe = ThunderbirdProfile.FindThunderbirdExe();
     readonly DispatcherTimer debounce = new() { Interval = TimeSpan.FromMilliseconds(220) };
@@ -27,15 +27,16 @@ public partial class MainWindow : Window
 
     CancellationTokenSource? indexCts;
     bool indexing, loading = true, webReady;
-    int searchSeq, previewSeq;
+    int searchSeq, previewSeq, renderCount;
     SearchHit? current;
     MimeMessage? currentMsg;
     List<string> highlight = new();
     string? currentViewFile;
 
-    public MainWindow(string? profileOverride)
+    public MainWindow(string? profileOverride, string? dbOverride = null)
     {
         InitializeComponent();
+        dbPath = dbOverride != null ? Path.GetFullPath(dbOverride) : IndexDb.DefaultPath;
         profileDir = profileOverride ?? ThunderbirdProfile.FindDefaultProfile();
 
         PeriodList.ItemsSource = new List<PeriodItem>
@@ -208,10 +209,12 @@ public partial class MainWindow : Window
         searchCts?.Cancel();
         var cts = searchCts = new CancellationTokenSource();
         var ct = cts.Token;
-        // Indicateur affiché seulement si la recherche dépasse 100 ms (pas de clignotement)
+        // Indicateur affiché seulement si la recherche dépasse 100 ms (pas de clignotement).
+        // "finished" évite qu'il s'affiche après coup quand la recherche a été plus rapide.
+        var finished = false;
         _ = Task.Delay(100).ContinueWith(_ =>
         {
-            if (seq != searchSeq || ct.IsCancellationRequested) return;
+            if (finished || seq != searchSeq || ct.IsCancellationRequested) return;
             SearchProgress.Visibility = Visibility.Visible;
             ResultInfo.Text = "Recherche en cours…";
         }, TaskScheduler.FromCurrentSynchronizationContext());
@@ -253,6 +256,7 @@ public partial class MainWindow : Window
             if (seq == searchSeq) SearchProgress.Visibility = Visibility.Hidden;
             if (seq == searchSeq) { ResultCount.Text = "Erreur"; ResultInfo.Text = ex.Message; }
         }
+        finally { finished = true; }
     }
 
     /// <summary>Même message après une nouvelle recherche : on réapplique seulement le surlignage.</summary>
@@ -457,7 +461,9 @@ public partial class MainWindow : Window
             // Fichier temporaire : NavigateToString est limité à 2 Mo (images intégrées)
             var dir = Path.Combine(tempDir, "vue");
             Directory.CreateDirectory(dir);
-            var file = Path.Combine(dir, $"m{hit.Id}-{seq}.html");
+            // Nom unique à chaque rendu : réafficher le même message (nouvelle recherche, images autorisées)
+            // ne doit pas supprimer juste après le fichier qu'on vient d'écrire.
+            var file = Path.Combine(dir, $"m{hit.Id}-{++renderCount}.html");
             await File.WriteAllTextAsync(file, html);
             var old = currentViewFile;
             currentViewFile = file;
@@ -531,7 +537,7 @@ public partial class MainWindow : Window
         try { Process.Start(new ProcessStartInfo(uri) { UseShellExecute = true }); } catch { }
     }
 
-    static readonly Brush MarkBrush = new SolidColorBrush(Color.FromRgb(0xFF, 0xE5, 0x8A));
+    static readonly Brush MarkBrush = new SolidColorBrush(Color.FromRgb(0xF6, 0xD2, 0xDC));
 
     /// <summary>Repli sans WebView2 : texte brut avec surlignage.</summary>
     static FlowDocument BuildDocument(string text, List<string> terms)
@@ -643,7 +649,7 @@ public partial class MainWindow : Window
     {
         IndexStatus.Text = status;
         IndexDetail.Text = detail;
-        IndexDot.Fill = new SolidColorBrush(error ? Color.FromRgb(0xE0, 0x5A, 0x4A) : busy ? Color.FromRgb(0xE8, 0xB3, 0x3A) : Color.FromRgb(0x3F, 0xB3, 0x7F));
+        IndexDot.Fill = new SolidColorBrush(error ? Color.FromRgb(0xE0, 0x5A, 0x4A) : busy ? Color.FromRgb(0x4F, 0x8F, 0xD9) : Color.FromRgb(0x3F, 0xB3, 0x7F));
     }
 
     void Index_Click(object sender, RoutedEventArgs e) => _ = RunIndex(full: false, quiet: false);

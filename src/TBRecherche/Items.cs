@@ -14,8 +14,8 @@ public static class Look
     static readonly Color[] Palette =
     {
         Color.FromRgb(0xB3, 0x26, 0x4A), Color.FromRgb(0x2F, 0x6F, 0xA8), Color.FromRgb(0x3C, 0x8D, 0x6B),
-        Color.FromRgb(0xC2, 0x7A, 0x1E), Color.FromRgb(0x7A, 0x4F, 0xB8), Color.FromRgb(0x1F, 0x8A, 0x92),
-        Color.FromRgb(0xA8, 0x4D, 0x2F), Color.FromRgb(0x55, 0x60, 0x7A), Color.FromRgb(0x9A, 0x3B, 0x87),
+        Color.FromRgb(0x4E, 0x7D, 0x3A), Color.FromRgb(0x7A, 0x4F, 0xB8), Color.FromRgb(0x1F, 0x8A, 0x92),
+        Color.FromRgb(0x2E, 0x5F, 0x78), Color.FromRgb(0x55, 0x60, 0x7A), Color.FromRgb(0x9A, 0x3B, 0x87),
     };
 
     static readonly Dictionary<string, SolidColorBrush> Cache = new();
@@ -79,7 +79,7 @@ public static class Look
             "pdf" => Color.FromRgb(0xD3, 0x3A, 0x2C),
             "doc" or "docx" or "odt" or "rtf" => Color.FromRgb(0x2B, 0x5C, 0xB8),
             "xls" or "xlsx" or "ods" or "csv" => Color.FromRgb(0x1E, 0x7D, 0x4A),
-            "ppt" or "pptx" or "odp" => Color.FromRgb(0xC9, 0x5A, 0x1E),
+            "ppt" or "pptx" or "odp" => Color.FromRgb(0xA8, 0x32, 0x6E),
             "jpg" or "jpeg" or "png" or "gif" or "bmp" or "webp" or "heic" or "tif" or "tiff" => Color.FromRgb(0x7A, 0x4F, 0xB8),
             "zip" or "rar" or "7z" => Color.FromRgb(0x6B, 0x5B, 0x3E),
             "eml" or "msg" => Color.FromRgb(0x1F, 0x8A, 0x92),

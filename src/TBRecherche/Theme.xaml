@@ -20,7 +20,7 @@
     <SolidColorBrush x:Key="SideSelected" Color="#2B2E36"/>
     <SolidColorBrush x:Key="SideInk" Color="#E6E7EA"/>
     <SolidColorBrush x:Key="SideMuted" Color="#868A96"/>
-    <SolidColorBrush x:Key="Mark" Color="#FFE58A"/>
+    <SolidColorBrush x:Key="Mark" Color="#F6D2DC"/>
 
     <FontFamily x:Key="Icons">Segoe MDL2 Assets</FontFamily>
 

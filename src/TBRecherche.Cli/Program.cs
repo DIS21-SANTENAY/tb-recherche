@@ -67,7 +67,7 @@ switch (cmd)
     }
 
     case "host":
-        NativeHost.Run(profile);
+        NativeHost.Run(profile, dbPath == IndexDb.DefaultPath ? null : dbPath);
         break;
 
     case "hosttest":
@@ -116,6 +116,9 @@ switch (cmd)
         var text = string.Join(" ", rest.Skip(2));
         var psi = new ProcessStartInfo(Environment.ProcessPath!) { RedirectStandardInput = true, RedirectStandardOutput = true, UseShellExecute = false, CreateNoWindow = true };
         psi.ArgumentList.Add("host");
+        // Même index et même profil que la commande (démonstration, tests)
+        psi.ArgumentList.Add("--db"); psi.ArgumentList.Add(dbPath);
+        if (profile != null) { psi.ArgumentList.Add("--profile"); psi.ArgumentList.Add(profile); }
         using var p = Process.Start(psi)!;
         var input = p.StandardInput.BaseStream; var output = p.StandardOutput.BaseStream;
         string Ask(string json)

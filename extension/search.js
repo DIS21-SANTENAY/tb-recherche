@@ -52,7 +52,7 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const fr = "fr-FR";
 
-const PALETTE = ["#B3264A", "#2F6FA8", "#3C8D6B", "#C27A1E", "#7A4FB8", "#1F8A92", "#A84D2F", "#55607A", "#9A3B87"];
+const PALETTE = ["#B3264A", "#2F6FA8", "#3C8D6B", "#4E7D3A", "#7A4FB8", "#1F8A92", "#2E5F78", "#55607A", "#9A3B87"];
 function colorFor(key) {
   let h = 2166136261 >>> 0;
   for (const ch of String(key || "").toLowerCase()) h = Math.imul(h ^ ch.charCodeAt(0), 16777619) >>> 0;
@@ -97,7 +97,7 @@ function fileSize(b) {
 function fileBadge(name) {
   const ext = (String(name).match(/\.([^.]+)$/) || [, ""])[1].toLowerCase();
   const c = ({ pdf: "#D33A2C", doc: "#2B5CB8", docx: "#2B5CB8", odt: "#2B5CB8", rtf: "#2B5CB8", xls: "#1E7D4A", xlsx: "#1E7D4A", ods: "#1E7D4A", csv: "#1E7D4A",
-    ppt: "#C95A1E", pptx: "#C95A1E", odp: "#C95A1E", jpg: "#7A4FB8", jpeg: "#7A4FB8", png: "#7A4FB8", gif: "#7A4FB8", heic: "#7A4FB8",
+    ppt: "#A8326E", pptx: "#A8326E", odp: "#A8326E", jpg: "#7A4FB8", jpeg: "#7A4FB8", png: "#7A4FB8", gif: "#7A4FB8", heic: "#7A4FB8",
     zip: "#6B5B3E", rar: "#6B5B3E", "7z": "#6B5B3E", eml: "#1F8A92", msg: "#1F8A92" })[ext] || "#6E6A66";
   return { label: (ext || "?").slice(0, 4).toUpperCase(), color: c };
 }
@@ -330,7 +330,7 @@ function renderResults(r) {
           <span class="pill"><i style="background:${colorFor("compte:" + h.account)}"></i>${esc(h.account)}</span>
           <span class="folder">${esc(folder)}</span>
           ${h.inAttachment ? '<span class="in-pj">dans une PJ</span>' : ""}
-          ${h.attach > 0 ? '<span class="clip" title="Pièces jointes">📎</span>' : ""}
+          ${h.attach > 0 ? '<span class="clip" title="Pièces jointes"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11.5l-7.8 7.8a5 5 0 0 1-7.1-7.1l8.1-8.1a3.3 3.3 0 0 1 4.7 4.7l-8 8a1.6 1.6 0 0 1-2.3-2.3l7.3-7.3"/></svg></span>' : ""}
         </div>
       </div>
     </div>`;

@@ -37,7 +37,7 @@
                     <StackPanel>
                         <DockPanel>
                             <Ellipse x:Name="IndexDot" Width="7" Height="7" Fill="#3FB37F" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                            <TextBlock Text="INDEX" FontSize="10.5" FontWeight="SemiBold" Foreground="{StaticResource SideMuted}"/>
+                            <TextBlock Text="Index" FontSize="10.5" FontWeight="SemiBold" Foreground="{StaticResource SideMuted}"/>
                         </DockPanel>
                         <TextBlock x:Name="IndexStatus" Margin="0,6,0,0" FontSize="12.5" Foreground="{StaticResource SideInk}" TextWrapping="Wrap" Text="Chargement..."/>
                         <TextBlock x:Name="IndexDetail" Margin="0,2,0,0" FontSize="11.5" Foreground="{StaticResource SideMuted}" TextWrapping="Wrap"/>
@@ -57,7 +57,7 @@
 
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="12,0,8,0">
                     <StackPanel>
-                        <TextBlock Text="COMPTES" Margin="10,4,0,6" FontSize="10.5" FontWeight="SemiBold" Foreground="{StaticResource SideMuted}"/>
+                        <TextBlock Text="Comptes" Margin="10,4,0,6" FontSize="10.5" FontWeight="SemiBold" Foreground="{StaticResource SideMuted}"/>
                         <ListBox x:Name="AccountList" Style="{StaticResource SideList}" SelectionChanged="Filter_Changed">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
@@ -70,7 +70,7 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
 
-                        <TextBlock Text="PÉRIODE" Margin="10,22,0,6" FontSize="10.5" FontWeight="SemiBold" Foreground="{StaticResource SideMuted}"/>
+                        <TextBlock Text="Période" Margin="10,22,0,6" FontSize="10.5" FontWeight="SemiBold" Foreground="{StaticResource SideMuted}"/>
                         <ListBox x:Name="PeriodList" Style="{StaticResource SideList}" SelectionChanged="Period_Changed">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
@@ -85,7 +85,7 @@
                             <DatePicker x:Name="ToDate" SelectedDateChanged="Filter_Changed"/>
                         </StackPanel>
 
-                        <TextBlock Text="FILTRES" Margin="10,22,0,4" FontSize="10.5" FontWeight="SemiBold" Foreground="{StaticResource SideMuted}"/>
+                        <TextBlock Text="Filtres" Margin="10,22,0,4" FontSize="10.5" FontWeight="SemiBold" Foreground="{StaticResource SideMuted}"/>
                         <CheckBox x:Name="AttachOnly" Style="{StaticResource Switch}" Content="Avec pièce jointe" Checked="Filter_Changed" Unchecked="Filter_Changed"/>
                     </StackPanel>
                 </ScrollViewer>

@@ -26,7 +26,7 @@ public static class NativeHost
         args.Any(a => a.EndsWith(".json", StringComparison.OrdinalIgnoreCase) && a.Contains(HostName, StringComparison.OrdinalIgnoreCase)) ||
         args.Any(a => a == ExtensionId);
 
-    static readonly string LogPath = Path.Combine(Path.GetDirectoryName(IndexDb.DefaultPath)!, "host.log");
+    static string LogPath = Path.Combine(Path.GetDirectoryName(IndexDb.DefaultPath)!, "host.log");
 
     /// <summary>Journal minimal de l'hôte : Thunderbird masque ses erreurs, ce fichier sert au diagnostic.</summary>
     public static void Log(string line)
@@ -40,8 +40,11 @@ public static class NativeHost
         catch { }
     }
 
-    public static void Run(string? profileOverride = null)
+    /// <param name="dbOverride">Index de test (tbr --db) : le journal est alors écrit à côté de lui.</param>
+    public static void Run(string? profileOverride = null, string? dbOverride = null)
     {
+        var dbPath = dbOverride != null ? Path.GetFullPath(dbOverride) : IndexDb.DefaultPath;
+        LogPath = Path.Combine(Path.GetDirectoryName(dbPath)!, "host.log");
         Log("démarrage, arguments : " + string.Join(" ", Environment.GetCommandLineArgs().Skip(1)));
         AppDomain.CurrentDomain.UnhandledException += (_, e) => Log("exception non gérée : " + e.ExceptionObject);
         MessageExtract.Init();
@@ -49,7 +52,6 @@ public static class NativeHost
         // sur un tuyau. On ouvre directement les poignées héritées de Thunderbird.
         var stdin = StdStream(-10, FileAccess.Read);
         stdout = StdStream(-11, FileAccess.Write);
-        var dbPath = IndexDb.DefaultPath;
         var profile = profileOverride ?? ThunderbirdProfile.FindDefaultProfile();
         var hostCts = new CancellationTokenSource();
         var pending = new List<Task>();

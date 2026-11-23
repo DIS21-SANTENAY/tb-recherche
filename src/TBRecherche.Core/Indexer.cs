@@ -45,6 +45,8 @@ public static class Indexer
         FileStream? lockFile = null;
         try
         {
+            // Sans le dossier, l'ouverture du verrou échouerait et passerait pour une indexation en cours
+            Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(dbPath))!);
             try
             {
                 lockFile = new FileStream(dbPath + ".lock", FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None,

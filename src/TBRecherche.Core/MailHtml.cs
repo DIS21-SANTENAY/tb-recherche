@@ -64,8 +64,8 @@ public static class MailHtml
               .plain { white-space: pre-wrap; }
               .plain .q { color: #8A847E; border-left: 3px solid #E8E5E1; padding-left: 10px; display: block; }
               blockquote { border-left: 3px solid #E8E5E1; margin-left: 4px; padding-left: 12px; color: #4A4643; }
-              mark.tbr { background: #FFE58A; color: inherit; border-radius: 3px; box-shadow: 0 0 0 2px #FFE58A; }
-              mark.tbr.first { background: #FFD24A; box-shadow: 0 0 0 2px #FFD24A; }
+              mark.tbr { background: #F6D2DC; color: inherit; border-radius: 3px; box-shadow: 0 0 0 2px #F6D2DC; }
+              mark.tbr.first { background: #EDA9BC; box-shadow: 0 0 0 2px #EDA9BC; }
               ::-webkit-scrollbar { width: 10px; height: 10px; }
               ::-webkit-scrollbar-thumb { background: #C9C4BE; border-radius: 5px; border: 2px solid #fff; }
             </style></head>

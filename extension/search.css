@@ -16,7 +16,7 @@
   --side-selected: #2B2E36;
   --side-ink: #E6E7EA;
   --side-muted: #868A96;
-  --mark: #FFE58A;
+  --mark: #F6D2DC;
   --radius: 12px;
   --shadow: 0 1px 3px rgba(0,0,0,.05), 0 6px 18px rgba(0,0,0,.05);
 }
@@ -70,7 +70,7 @@ button { font: inherit; cursor: pointer; }
 .index-card { margin-top: auto; background: #202228; border-radius: 12px; padding: 12px 14px; }
 .index-title { font-size: 10.5px; font-weight: 600; color: var(--side-muted); display: flex; align-items: center; gap: 8px; }
 .dot { width: 7px; height: 7px; border-radius: 50%; background: #3FB37F; display: inline-block; }
-.dot.busy { background: #E8B33A; }
+.dot.busy { background: #4F8FD9; }
 .dot.error { background: #E05A4A; }
 .index-status { margin-top: 6px; font-size: 12.5px; }
 .index-detail { font-size: 11.5px; color: var(--side-muted); margin-top: 2px; }
@@ -150,7 +150,9 @@ header { display: flex; align-items: center; gap: 10px; padding: 10px 16px 6px; 
 .pill { display: inline-flex; align-items: center; gap: 5px; background: #F1EFEC; color: var(--ink2); border-radius: 5px; padding: 1px 6px; white-space: nowrap; }
 .pill i { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
 .in-pj { background: var(--accent-soft); color: var(--accent); font-weight: 600; border-radius: 5px; padding: 1px 6px; white-space: nowrap; }
-.clip { font-size: 12px; }
+.clip { display: inline-flex; }
+.clip svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.empty-icon svg { width: 30px; height: 30px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; }
 mark { background: var(--mark); color: inherit; border-radius: 3px; padding: 0 1px; }
 
 .empty, .reader-empty { margin: auto; text-align: center; display: grid; gap: 6px; justify-items: center; padding: 30px; }
