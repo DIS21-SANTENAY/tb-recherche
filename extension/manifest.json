@@ -1,0 +1,39 @@
+{
+  "manifest_version": 3,
+  "name": "TB Recherche",
+  "version": "1.0.0",
+  "description": "Recherche instantanée dans tous vos mails et le contenu de leurs pièces jointes.",
+  "author": "DIS21",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "tb-recherche@dis21.fr",
+      "strict_min_version": "128.0"
+    }
+  },
+  "icons": {
+    "16": "icons/16.png",
+    "32": "icons/32.png",
+    "48": "icons/48.png",
+    "64": "icons/64.png",
+    "128": "icons/128.png"
+  },
+  "action": {
+    "default_title": "TB Recherche (Ctrl+Alt+R)",
+    "default_label": "Recherche",
+    "default_icon": {
+      "16": "icons/16.png",
+      "32": "icons/32.png",
+      "64": "icons/64.png"
+    }
+  },
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": { "default": "Ctrl+Alt+R" },
+      "description": "Ouvrir TB Recherche"
+    }
+  },
+  "permissions": ["nativeMessaging", "messagesRead", "accountsRead", "tabs"]
+}

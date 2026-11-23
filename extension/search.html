@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>TB Recherche</title>
+  <link rel="icon" href="icons/32.png">
+  <link rel="stylesheet" href="search.css">
+</head>
+<body>
+  <aside class="side">
+    <div class="brand">
+      <img src="icons/64.png" alt="">
+      <div><b>TB Recherche</b><span>Mails et pièces jointes</span></div>
+    </div>
+
+    <h6>Comptes</h6>
+    <ul id="accounts" class="nav"></ul>
+
+    <h6>Période</h6>
+    <ul id="periods" class="nav"></ul>
+    <div id="customDates" class="dates" hidden>
+      <label>Du <input type="date" id="from"></label>
+      <label>Au <input type="date" id="to"></label>
+    </div>
+
+    <h6>Filtres</h6>
+    <label class="switch">
+      <span>Avec pièce jointe</span>
+      <input type="checkbox" id="attachOnly"><i></i>
+    </label>
+
+    <div class="index-card">
+      <div class="index-title"><span id="indexDot" class="dot"></span>INDEX</div>
+      <div id="indexStatus" class="index-status">Connexion au moteur…</div>
+      <div id="indexDetail" class="index-detail"></div>
+      <div id="indexBar" class="bar" hidden><div></div></div>
+      <div class="index-btns">
+        <button id="refresh" title="Relire les dossiers modifiés">Actualiser</button>
+        <button id="rebuild" title="Reconstruire tout l'index">Reconstruire</button>
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <header>
+      <div class="search" id="searchShell">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5 20 20"/></svg>
+        <input id="q" type="search" autocomplete="off" spellcheck="false"
+               placeholder="Rechercher dans les mails et leurs pièces jointes" autofocus>
+        <button id="clear" class="clear" title="Effacer (Échap)" hidden>✕</button>
+      </div>
+      <button id="helpBtn" class="ghost">Astuces</button>
+    </header>
+
+    <div id="help" class="help" hidden>
+      <b>Rechercher efficacement</b>
+      <p>Tous les mots sont obligatoires, en début de mot, sans tenir compte des accents ni des majuscules.</p>
+      <table>
+        <tr><td><code>facture dupont</code></td><td>les deux mots</td></tr>
+        <tr><td><code>"bon de commande"</code></td><td>l'expression exacte</td></tr>
+        <tr><td><code>devis OU facture</code></td><td>l'un ou l'autre</td></tr>
+        <tr><td><code>facture -relance</code></td><td>sans le mot « relance »</td></tr>
+        <tr><td><code>de:dupont</code></td><td>expéditeur</td></tr>
+        <tr><td><code>a:martin</code></td><td>destinataires (À et Cc)</td></tr>
+        <tr><td><code>objet:commande</code></td><td>dans l'objet</td></tr>
+        <tr><td><code>corps:palette</code></td><td>dans le texte du mail</td></tr>
+        <tr><td><code>pj:pdf</code></td><td>nom d'une pièce jointe</td></tr>
+        <tr><td><code>contenu:siret</code></td><td>texte des pièces jointes</td></tr>
+        <tr><td><code>dossier:douanes</code></td><td>dans un dossier précis</td></tr>
+      </table>
+      <p class="muted">Flèches haut et bas pour parcourir, Entrée pour ouvrir le message dans Thunderbird.</p>
+    </div>
+
+    <div id="hostError" class="host-error" hidden></div>
+
+    <div class="body">
+      <section class="list">
+        <div class="list-head">
+          <div>
+            <div id="count" class="count"></div>
+            <div id="info" class="muted small"></div>
+          </div>
+          <div class="seg" id="sort">
+            <button data-sort="date" class="on">Récents</button>
+            <button data-sort="relevance">Pertinence</button>
+            <button data-sort="old">Anciens</button>
+          </div>
+        </div>
+        <div id="searchProgress" class="progress" hidden><div></div></div>
+        <div id="results" class="results" tabindex="0"></div>
+        <div id="empty" class="empty" hidden>
+          <div class="empty-icon">⌕</div>
+          <b>Aucun message trouvé</b>
+          <span class="muted">Essayez moins de mots, ou retirez un filtre à gauche.</span>
+        </div>
+      </section>
+
+      <section class="reader">
+        <div id="readerEmpty" class="reader-empty">
+          <div class="empty-icon">✉</div>
+          <b>Sélectionnez un message</b>
+          <span id="readerHint" class="muted">Son contenu s'affichera ici, avec vos mots surlignés.</span>
+        </div>
+        <div id="reader" class="reader-in" hidden>
+          <div class="reader-head">
+            <div class="toolbar">
+              <div class="crumb">
+                <span class="pill"><i id="rDot"></i><span id="rAccount"></span></span>
+                <span class="sep">›</span>
+                <span id="rFolder" class="muted"></span>
+              </div>
+              <div class="actions">
+                <button id="remoteBtn" class="ghost" hidden title="Les images hébergées sur Internet sont bloquées pour éviter le pistage">Afficher les images</button>
+                <button id="folderBtn" title="Sélectionner le message dans son dossier">Voir dans le dossier</button>
+                <button id="openBtn" class="primary" title="Ouvrir le message dans Thunderbird (Entrée)">Ouvrir</button>
+              </div>
+            </div>
+            <h1 id="rSubject"></h1>
+            <div class="from">
+              <div id="rAvatar" class="avatar big"></div>
+              <div class="from-txt"><b id="rFromName"></b><span id="rFromAddr" class="muted"></span></div>
+              <span id="rDate" class="muted small"></span>
+            </div>
+            <div id="rTo" class="to"></div>
+            <div id="rAtts" class="atts"></div>
+            <div id="rNote" class="note" hidden></div>
+          </div>
+          <iframe id="frame" sandbox="allow-same-origin" title="Contenu du message"></iframe>
+        </div>
+      </section>
+    </div>
+    <div id="toast" class="toast" hidden></div>
+  </main>
+  <script src="search.js"></script>
+</body>
+</html>
